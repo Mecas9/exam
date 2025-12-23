@@ -1,3 +1,8 @@
 pytest>=7.0
 pytest-cov>=4.0
+<<<<<<< HEAD
 coverage>=7.0
+=======
+pytest>=7.0
+
+>>>>>>> 06213e46ca7897ae787a8fe4c3cc857b5198c57e
