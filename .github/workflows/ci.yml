@@ -22,13 +22,26 @@ jobs:
           cache: 'pip'
           cache-dependency-path: |
             requirements.txt
-            tests/requirements.txt  # если есть отдельный файл для тестов
+            tests/requirements.txt
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          # Основные зависимости
           pip install -r requirements.txt
-          pip install -r tests/requirements.txt  # зависимости для тестов
+          
+          # Зависимости для тестов (если файл существует)
+          if [ -f "tests/requirements.txt" ]; then
+            pip install -r tests/requirements.txt
+          else
+            echo "Warning: tests/requirements.txt not found, skipping test dependencies"
+          fi
+
+      - name: Verify pytest is installed
+        run: |
+          pip list | grep pytest || (echo "ERROR: pytest not installed!" && exit 1)
 
       - name: Run unit tests (pytest)
         run: pytest tests/test_sample.py -v --tb=short
@@ -44,8 +57,9 @@ jobs:
       - name: Generate coverage report
         if: success()
         run: |
+          # Убедимся, что coverage и pytest-cov установлены
           pip install coverage pytest-cov
-          coverage run -m pytest tests/test_sample.py
+          coverage run -m pytest tests/
           coverage report
           coverage html -d coverage-report
 
